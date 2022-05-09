@@ -50,10 +50,11 @@ Los comandos de inicio son
 python3 tx_process.py rate
 python3 rx_process.py rate
 
+rate=>Velocidad (Mbps)
 Para poder utilizar las librerias de encryptado se necesita ejecutar los siguientes comandos
 pip3 install random2
 pip3 install pickle
-pip install python-secrets
+pip3 install python-secrets
 pip3 install pycryptodome
 pip3 install pycopy-binascii
 
