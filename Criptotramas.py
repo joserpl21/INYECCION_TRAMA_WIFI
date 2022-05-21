@@ -1,10 +1,14 @@
 # 2345678901234567890123456789012345678901234567890123456789012345678901234567890
-
+# -*- coding: utf-8 -*-
 from Generatramas import *
 import secrets
-
+import random
 from datetime import datetime, timedelta
+from random import getrandbits
 from Crypto.Cipher import  AES
+import sympy
+from sympy.ntheory import nextprime, is_quad_residue, isprime
+import functools
 #pip3 install pycryptodome
 def MPDU_enc(MPDU,key):  # Fucnión para generar un MPDU cifrado
     PN = int.from_bytes(secrets.token_bytes(6),byteorder='big')  # Contador de AMPDUs cifradas que debería sincronizarser con el cliente
@@ -357,25 +361,44 @@ def AMPDU_dec(AMPDU, claves):  # Función para descifrar un AMPDU cifrado con la
     return MSDUs, lapso  # Devuelvo dos listas con todos los MPDUs y MSDUs descifrados
 
 
-def AMSDU_enc(AMSDU):  # Función que cifra un AMSDU con el teorema chino del resto (CRT)
+def AMSDU_enc(AMSDU,MSDU):  # Función que cifra un AMSDU con el teorema chino del resto (CRT) - modificacion con poner un AMPDU
     MSDUs = []  # Creamos una lista para los MSDUs "desentramados"
-    ps = []  # Claves p
-    xs = []  # Claves x
+    ps = [1100645304239144332874899719259313845702512851699,1100645304239144332874899719259330726252929972829,18465764008605840127818093568353291822549225699331595729]  # Claves p
+    xs = [469185440907188674086266365887713402920751416175,469185440907188674086266365887713402920751416175,7016009363412435780763082007262025939147461935248010908]  # Claves x
     a = []  # Máscaras aleatorias
-    i = 0  # Contador de MSDUs
-    Hdr = getrandbits(1023)  # Cabecera común para el cifrado aleatorio
+    n = 0  # Contador de MSDUs
+    #Hdr = random.getrandbits(1023)  # Cabecera común para el cifrado aleatorio
+    Hdr=15954397600484676080445144553223529992678013943537230069224121000855699303061777531981089406222510881421088752704688036147253082732657897862191895053631674856772128322391273493214154863018969779796561231280601263793302777253129776032382760813815413222441888256216530367314241202928278526289479100743111536202
+    #print("HDR", Hdr)
     filtro1 = (1 << 112) - 1  # Filtros para leer los campos de la cabecera
     filtro2 = (1 << 16) - 1
     tiempo_inicial = datetime.now()
+    for i in MSDU:
+        print("MSDU ANTES DE ENCRIPTAR",i)
+        #p = nextprime(i + 3)  # Calculo la clave p
+        #ps.append(p)  # y la almaceno en una lista
+        #xs.append(getrandbits(p.bit_length() - 1))  # Calculo la máscara aleatoria de cada diferente difrado
+        a.append((i + pow(Hdr, xs[n], ps[n])) % ps[n])  # y enmascaro el MSDU
+        n = n + 1
+
+    return (Hdr, MPDU_gen(MSDU_gen2(chinese_remainder(ps, a))), ps, xs)  # Devuelvo la cabecera aleatoria y un MPDU cifrado con el CRT
+
+
+"""        
     while (AMSDU != 0):  # Vamos a recorrer el AMSDU hasta que se vacíe
         bytes_restantes = (7 + AMSDU.bit_length()) // 8
         cabecera = (AMSDU & (filtro1 << (8 * (bytes_restantes - 14)))) >> (8 * (bytes_restantes - 14))
         # Calculamos la cabecera
+        print("campo cabecera",bytes_restantes)
         longitud = cabecera & filtro2  # Y la longitud del MSDU
+        print("campo longitud",longitud)
+        #Hemos cambiado el valor de la longitud 100 = longitud_payload
+        #longitud = 100  # Y la longitud del MSDU
         pad = 4 - (longitud % 4)
         if ((pad == 4) or ((8 * longitud) >= (AMSDU.bit_length() - 256))): pad = 0
         # Determinamos si el MSDU contiene padding
-        filtro = ((1 << 8 * (14 + 18 + longitud + pad)) - 1) << (8 * (bytes_restantes - (14 + 18 + longitud + pad)))
+        print(bytes_restantes - (14 + 18 + longitud + pad))<< (8 * (bytes_restantes - (14 + 18 + longitud + pad)))
+        filtro = ((1 << 8 * (14 + 18 + longitud + pad)) - 1)
         # He sumado 18 bytes del Mesh Control
         MSDU_aux = (AMSDU & filtro) >> (8 * (bytes_restantes - (14 + 18 + longitud + pad)))
         # Calculo el MSDU y lo quito del agregado
@@ -387,8 +410,7 @@ def AMSDU_enc(AMSDU):  # Función que cifra un AMSDU con el teorema chino del re
         a.append((MSDUs[i] + pow(Hdr, xs[i], p)) % p)  # y enmascaro el MSDU
         i = i + 1
     lapso = datetime.now() - tiempo_inicial
-    return (Hdr, MPDU_gen(MSDU_gen2(chinese_remainder(ps, a))), ps, xs,
-            lapso)  # Devuelvo la cabecera aleatoria y un MPDU cifrado con el CRT
+"""
 
 
 def AMSDU_enc2(f, velocidad, slot_time, SIFS, preambulo, ack, CW, AMSDUs, m):
@@ -453,8 +475,8 @@ def AMSDU_dec(Hdr, MPDU, ps, xs):  # Función para descifrar un MPDU que contine
     tiempo_inicial = datetime.now()
     for i in range(len(ps)):
         MSDUs.append((MSDU - pow(Hdr, xs[i], ps[i])) % ps[i])
-    lapso = datetime.now() - tiempo_inicial
-    return (MSDUs, lapso)
+
+    return (MSDUs)
 
 
 def chinese_remainder(n, a):  # Función para calcular el cifrado con el CRT
