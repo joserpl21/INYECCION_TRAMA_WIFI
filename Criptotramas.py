@@ -6,8 +6,8 @@ import random
 from datetime import datetime, timedelta
 from random import getrandbits
 from Crypto.Cipher import  AES
-import sympy
-from sympy.ntheory import nextprime, is_quad_residue, isprime
+#import sympy
+#from sympy.ntheory import nextprime, is_quad_residue, isprime
 import functools
 #pip3 install pycryptodome
 def MPDU_enc(MPDU,key):  # Fucnión para generar un MPDU cifrado
