@@ -4,12 +4,12 @@ import binascii
 import random
 import secrets
 from datetime import datetime, timedelta
-
+from scapy.utils import hexdump
 
 
 def MSDU_gen (longitud_payload, no_ultimo):                                # Función para quenerar un MSDU de datos aleatorio, pero con cabeceras correctas
-    DA = b'\xAA' + secrets.token_bytes(5)                                # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
-    SA = secrets.token_bytes(6)                                          # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    DA =b'\x00\xc0\xca\xa4\x73\x7b'                                # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    SA =b'\x00\xc0\xca\xa4\x73\x7c'                                         # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
     Payload = secrets.token_bytes(longitud_payload)                          # Elegimos una carga aleatoria de tamaño fijado en la entrada
     Mesh_flags = b'\x40'                                                   # Supondremos que necesitamos dos direcciones más
     Mesh_TTL = secrets.token_bytes(1)                                        # TTL dentro de la red mesh
@@ -17,16 +17,23 @@ def MSDU_gen (longitud_payload, no_ultimo):                                # Fun
     #cambiamos esto
     Address5 = secrets.token_bytes(6)                                         # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
     Address6 = secrets.token_bytes(6)                                         # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
-    #Tener en cuenta si se va acumular dentro de AMSDU
+    #Tener en cuenta si se va acumular dentro de AMSDU -> Mesh_control solo tiene sentido cuando lo vas a agregar en un AMSDU
+    #En un AMPDU no es ncecesario el mes_control
+    #print("MSDU_gen ", longitud_payload)
     Mesh_control = Mesh_flags + Mesh_TTL + Mesh_sequence_number + Address5 + Address6
-    Imponible = DA + SA + longitud_payload.to_bytes(2, byteorder='big') + Mesh_control + Payload
+
+    Imponible = DA + SA + longitud_payload.to_bytes(2, byteorder='big') + Payload
+
     longitud_padding = 4 - (len(Imponible)%4)                             # Calculamos la longitud del padding
+
     if ((longitud_padding != 4) and (no_ultimo == 'true')):
         MSDU = Imponible + secrets.token_bytes(longitud_padding)
     else: MSDU = Imponible                                                 # Añadimos el padding si lo necesita
 
-    print("MSDU: ",MSDU)
-    return int.from_bytes(MSDU, byteorder='big')
+    #print("MSDU: ",MSDU)
+    a=int.from_bytes(MSDU, byteorder='big')
+    #print("MSDU_DECIMAL:",a)
+    return a
 
 def MSDU_gen2 (Payload):                                                   # Función para quenerar un MSDU de datos a partir de un payload determinado
     longitud_payload = (7 + Payload.bit_length()) // 8                     # Calculamos la longitud en bytes del payload
@@ -335,19 +342,18 @@ def MPDU_gen (MSDU):                                                      # Func
                                                                           # order = '1' ordenados
                                                                           # frame_control = (version_del_protocolo + tipo + to_DS + from_DS + more_fragments
                                                                           # + retry + power_management +  more_data + wep + order)
-    Duration = secrets.token_bytes(2)                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
-    Address1 = secrets.token_bytes(6)                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
-    Address2 = secrets.token_bytes(6)                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
-    Address3 = secrets.token_bytes(6)                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    Duration = b'\x11\x00'                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    Address1 = b'\x00\xc0\xca\xa4\x73\x7b'                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    Address2 = b'\x00\xc0\xca\xa4\x73\x7c'                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    Address3 = b'\x00\xc0\xca\xa4\x73\x7c'                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
     Sequence_control = b'\x00\x00'                                        # Supondremos sin fragmentación del MSDU
-    Address4 = secrets.token_bytes(6)                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
+    Address4 = b'\x00\xc0\xca\xa4\x73\x7b'                                        # No sabemos a priori al valor de este campo, así que elgimos un valor aleatorio
                                                                           # No incluimos los byates de QoS y de control HT porque hemos considerado
                                                                           # que la trama va a ser de datos.
     Imponible = (frame_control + Duration + Address1 + Address2 + Address3 + Sequence_control
                + Address4 + MSDU.to_bytes((MSDU.bit_length() + 7) // 8, byteorder='big'))
     FCS = binascii.crc32(Imponible)
     MPDU = Imponible + FCS.to_bytes(4, byteorder='big')                   # Adjuntamos el CRC
-    #print("ANTES DE CIFRAR MPDU ",MPDU)
     return int.from_bytes(MPDU, byteorder='big')
 
 
