@@ -21,16 +21,18 @@ def MSDU_gen (longitud_payload, no_ultimo):                                # Fun
     #En un AMPDU no es ncecesario el mes_control
     #print("MSDU_gen ", longitud_payload)
     Mesh_control = Mesh_flags + Mesh_TTL + Mesh_sequence_number + Address5 + Address6
-
+    Payload=b'\x8F\x1E\x55\x75\x63\x90\x31\x21\xFC\x89'
     Imponible = DA + SA + longitud_payload.to_bytes(2, byteorder='big') + Payload
 
     longitud_padding = 4 - (len(Imponible)%4)                             # Calculamos la longitud del padding
 
     if ((longitud_padding != 4) and (no_ultimo == 'true')):
         MSDU = Imponible + secrets.token_bytes(longitud_padding)
+        print("e")
     else: MSDU = Imponible                                                 # Añadimos el padding si lo necesita
 
-    #print("MSDU: ",MSDU)
+    print("MSDU: ")
+    print(hexdump(MSDU))
     a=int.from_bytes(MSDU, byteorder='big')
     #print("MSDU_DECIMAL:",a)
     return a
