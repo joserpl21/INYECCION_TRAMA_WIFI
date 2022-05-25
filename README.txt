@@ -45,13 +45,7 @@ tx_process	    rx_process
 |                      |
 |<------- BA  ---------|            Block ACK
 
-Para poder ejecutar los codigos se necesita cambiar el interfaz de tx_process y rx_process
-Los comandos de inicio son
-python3 tx_process.py rate formaCifrado
-python3 rx_process.py rate formaCifrado
 
-rate=>Velocidad (Mbps)
-formaCifrado=>1(Cifrado normal AMSDU), 2(Cifrado de los chinos)
 
 Para poder utilizar las librerias de encryptado se necesita ejecutar los siguientes comandos
 pip3 install random2
@@ -60,3 +54,16 @@ pip3 install python-secrets
 pip3 install pycryptodome
 pip3 install pycopy-binascii
 
+Para poder ejecutar los codigos se necesita cambiar el interfaz de tx_process y rx_process
+Los comandos de inicio son
+python3 tx_process.py rate formaCifrado
+python3 rx_process.py rate formaCifrado
+
+rate=>Velocidad (Mbps)
+formaCifrado=>1(Cifrado normal AMSDU), 2(Cifrado de los chinos)
+
+Ficheros necesarios para cifrado normal:
+
+Todos
+
+Ficheros necesarios para cifrado de los chinos:
