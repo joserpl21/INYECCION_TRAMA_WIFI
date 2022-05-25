@@ -53,6 +53,7 @@ def PacketHandler(pkt):
                 ap_list.append(pkt.subtype)
                 # Paquete AMPDU SIMPLE
                 print("Forma seleccionada: ",forma)
+
                 if int(forma) == 1:
                     AMPDU, AMPDUint = cifrarNORMAL(key)
                     packet = []
@@ -64,6 +65,7 @@ def PacketHandler(pkt):
                     packet = []
                     qoscontrol = b'\x00\x00'
                     Hdr, mpduCi_Hex, mpduCi, ps, xs = cifrarCRT()
+                    print(hexdump(mpduCi_Hex))
                     packet.append(RadioTap() / Dot11(type=2, subtype=8, addr1=pkt.addr2, addr2=AP_MAC,
                                                      addr3=AP_MAC) / qoscontrol / mpduCi_Hex)
                     sendp(packet, iface=IFACE, verbose=False)
