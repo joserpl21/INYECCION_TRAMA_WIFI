@@ -29,15 +29,16 @@ def PacketHandler(pkt):
             ap_list.append(pkt.subtype)
             ver=pkt.getlayer(Dot11)
             print("LONGITUD ENTRADA RADIO",len(ver))
-            print(ver)
+            print(hexdump(ver))
             n=0
             numero=int.from_bytes(ver, byteorder='big')
             hexa=numero.to_bytes((numero.bit_length() + 7) // 8, byteorder='big')
             print("LONGITUD conversion entrada", len(hexa))
+
             AMPDU_FINAL = b''
             for i in hexa:
                 #print(hex(i))
-                if n<(len(hexa)-4) and n>=24:
+                if n<(len(hexa)-4) and n>=26:
                     if i != 0:
                         by = i.to_bytes((i.bit_length() + 7) // 8, byteorder='big')
                         AMPDU_FINAL = AMPDU_FINAL + by
@@ -45,7 +46,9 @@ def PacketHandler(pkt):
                         AMPDU_FINAL = AMPDU_FINAL + b'\x00'
 
                 n = n + 1
+            print(hexdump(AMPDU_FINAL))
             intAMPDUfinal=int.from_bytes(AMPDU_FINAL, byteorder='big')
+
             if int(forma) == 1 :
             #print("Longitud AMPDU_FINAL",len(AMPDU_FINAL))
                 print("AMSDU CIFRADO", AMPDU_FINAL)
@@ -54,8 +57,9 @@ def PacketHandler(pkt):
                 print("AMSDU DESCIFRADO", descifrado)
             if int(forma) == 2:
                 MSDUs = AMSDU_dec(Hdr, intAMPDUfinal, ps, xs)
+                #nuevo=MSDUs.to_bytes((MSDUs.bit_length() + 7) // 8, byteorder='big')
                 for i in MSDUs:
-                    print(i)
+                    print(hexdump(i.to_bytes((i.bit_length() + 7) // 8, byteorder='big')))
             exit()
             #MSDU, lapso = AMPDU_dec(int.from_bytes(ver, byteorder='big'), key)
 
