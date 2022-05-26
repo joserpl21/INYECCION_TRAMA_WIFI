@@ -1,6 +1,7 @@
 #2345678901234567890123456789012345678901234567890123456789012345678901234567890
 # -*- coding: utf-8 -*-
-import binascii
+#import binascii
+import zlib
 import random
 import secrets
 from datetime import datetime, timedelta
@@ -354,7 +355,7 @@ def MPDU_gen (MSDU):                                                      # Func
                                                                           # que la trama va a ser de datos.
     Imponible = (frame_control + Duration + Address1 + Address2 + Address3 + Sequence_control
                + Address4 + MSDU.to_bytes((MSDU.bit_length() + 7) // 8, byteorder='big'))
-    FCS = binascii.crc32(Imponible)
+    FCS = zlib.crc32(Imponible)
     MPDU = Imponible + FCS.to_bytes(4, byteorder='big')                   # Adjuntamos el CRC
     return int.from_bytes(MPDU, byteorder='big')
 
