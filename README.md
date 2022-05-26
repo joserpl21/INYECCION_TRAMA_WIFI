@@ -1,3 +1,4 @@
+```bash
 tx_process	    rx_process
 |                      |
 |------- Beacon ------>|            The announced SSID is "ap0"
@@ -44,15 +45,18 @@ tx_process	    rx_process
 |------ BA Request --->|            Block ACK request
 |                      |
 |<------- BA  ---------|            Block ACK
+```
 
 
 
-Para poder utilizar las librerias de encryptado se necesita ejecutar los siguientes comandos
+##Para poder utilizar las librerias de encryptado se necesita ejecutar los siguientes comandos
+```bash
 pip3 install random2
 pip3 install pickle5
 pip3 install python-secrets
 pip3 install pycryptodome
 pip3 install zlib-state
+```
 
 Para poder ejecutar los codigos se necesita cambiar el interfaz de tx_process y rx_process
 Los comandos de inicio son
