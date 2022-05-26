@@ -1,9 +1,9 @@
 #2345678901234567890123456789012345678901234567890123456789012345678901234567890
 # -*- coding: utf-8 -*-
-import pickle
+from pickle5 import pickle 
 import math
 import random
-import binascii
+#import binascii
 import functools
 import secrets
 
