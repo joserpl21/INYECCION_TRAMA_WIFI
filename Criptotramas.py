@@ -9,6 +9,7 @@ from Crypto.Cipher import  AES
 #import sympy
 #from sympy.ntheory import nextprime, is_quad_residue, isprime
 import functools
+import zlib
 #pip3 install pycryptodome
 def MPDU_enc(MPDU,key):  # Fucnión para generar un MPDU cifrado
     PN = int.from_bytes(secrets.token_bytes(6),byteorder='big')  # Contador de AMPDUs cifradas que debería sincronizarser con el cliente
@@ -56,7 +57,7 @@ def MPDU_enc(MPDU,key):  # Fucnión para generar un MPDU cifrado
                                                                                              byteorder='big')  # Hemos fijado el Key_ID=00
     Imponible = (old_header.to_bytes(30, byteorder='big')
                  + ccmp_header + ciphertext + mic)  # Lo unimos todo para calcula el CRC
-    FCS = binascii.crc32(Imponible)  # Calculamos el CRC
+    FCS = zlib.crc32(Imponible)  # Calculamos el CRC
     MPDU_enc = Imponible + FCS.to_bytes(4, byteorder='big')  # Lo unimos todo para generar el nuevo MPDU cifrado
     return (int.from_bytes(MPDU_enc, byteorder='big'))  # Además enviamos la clave para la emulación
 
