@@ -56,6 +56,8 @@ pip3 install pickle5
 pip3 install python-secrets
 pip3 install pycryptodome
 pip3 install zlib-state
+sudo apt-get update -y
+sudo apt-get install -y python3-gmpy2
 ```
 
 Para poder ejecutar los codigos se necesita cambiar el interfaz de tx_process y rx_process
