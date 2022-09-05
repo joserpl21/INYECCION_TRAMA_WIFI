@@ -3,64 +3,51 @@
 import pickle
 import math
 import random
-import binascii
 import functools
 import secrets
-
-# This Python file uses the following encoding: utf-8
 import os, sys
 from Generatramas import *
 from Criptotramas import *
 from random import getrandbits
-
+import scapy.all as scapy
 from datetime import datetime, timedelta
 
-
-def nextprime(n):
-	prime=0
-	n+=1
-	for i in range(2,int(n**0.5)+2):
-		if n%i==0:
-			prime=0
-			break
-		else:
-			prime=1
-	if prime==1:
-		print(n)
-		return
-	else:
-		nextprime(n)
-		return
-
-
-def demo4(key):                                                           # Funcion paara el calculo de las simulaciones y almacenamiento de
-                                                                       # resultados parciales, que no incluye los descifrados ni el cifrado completo de
-                                                                       # nuestra propuesta
-    tiempo_inicialb = datetime.now()
-    print("Vamos")                                                     # Comenzamos cargando los valores del escenario conforme a diferentes tecnologias
-    f = open('standard.DAT', "r")
-    velocidad = int(f.readline())		                       # b, n, g, ac = 11, 54, 300, 1300 Mbps
-    slot_time = int(f.readline())                                      # 9, 20 = OFDM, DSSS
-    SIFS = int(f.readline())			                       # b, n, g, ac = 10, 10, 10, 16 microsegundos
-    DIFS = 2 * slot_time + SIFS
-    preambulo = int(f.readline())		                       # b, n, g, ac = 192, 96, 96, 96 microsegundos
-    ack = int(f.readline())		                               # 56 microsegundos
-    CW = int(f.readline())
-    f.close()
-
+def cifrarNORMAL(key):  #
     f = open('datos3_new.DAT', "r")
+    AMPDUs = AMPDU_enc2(f, key)
+    print(AMPDUs)
+    cifrado = AMPDUs[0].to_bytes((AMPDUs[0].bit_length() + 7) // 8, byteorder='big')
+    return (cifrado, AMPDUs)
+def cifrarCRT(ps,xs,Hdr):
+    AMSDU, MSDUs1 = AMSDU_gen(1, 10)
+    AMSDU, MSDUs2 = AMSDU_gen(1, 20)
+    AMSDU, MSDUs3 = AMSDU_gen(1, 30)
+    AMSDU, MSDUs4 = AMSDU_gen(1, 40)
+    AMSDU, MSDUs5 = AMSDU_gen(1, 50)
 
-    AMPDUs = AMPDU_enc2(f, velocidad, slot_time, SIFS, preambulo, ack, CW,key)
-    cifrado = AMPDUs[0].to_bytes((AMPDUs[0].bit_length() + 7) // 8,byteorder='big')
-    return (cifrado,AMPDUs)
-    pu = open('AMPDU_CIFRADO.txt', "wb")
-    pickle.dump(descifrado, pu)
-    pu.close()
-    f = open('AMPDU_CIFRADO.txt', "wb")
-    print("despues de abrir el fichero",f.read())
-    exit()
-    print("CIFRADO", descifrado)
-    MSDU, lapso = AMPDU_dec(AMPDUs[0], claves[0])
-    descifrado=MSDU[0].to_bytes((MSDU[0].bit_len0gth()+7) // 8, byteorder='big')
-    print("Descifrado",descifrado)
+    MPDU_Total=[]
+    MPDU_Total.append(MPDU_gen(MSDUs5[0],2))
+    MPDU_Total.append(MPDU_gen(MSDUs2[0],1))
+    MPDU_Total.append(MPDU_gen(MSDUs4[0],1))
+    MPDU_Total.append(MPDU_gen(MSDUs1[0],0))
+    MPDU_Total.append(MPDU_gen(MSDUs3[0],1))
 
+    mpduCi=AMSDU_enc(MPDU_Total,ps,xs,Hdr)
+
+    mpduCi_Hex= mpduCi.to_bytes((mpduCi.bit_length() + 7) // 8,byteorder='big')
+
+    return (mpduCi_Hex,mpduCi)
+
+
+def calc_primos(num, long):
+    psnew = []                      #Vector con las claves ps
+    xsnew = []                      #Vector con las claves xs
+
+    Hdr = random.getrandbits(2047)  # Cabecera común para el cifrado aleatorio
+    m = 2 ** (long * 8)
+    for i in list(range(num)):
+        pnew = nextprime(m + 3)  # Calculo la clave p
+        m = pnew
+        psnew.append(pnew)  # y la almaceno en una lista
+        xsnew.append(getrandbits(pnew.bit_length() - 1))  # Calculo la máscara aleatoria de cada diferente difrado
+    return (psnew, xsnew, Hdr)
