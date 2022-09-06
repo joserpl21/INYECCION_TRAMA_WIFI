@@ -3,7 +3,7 @@
 from scapy.layers.dot11 import Dot11, RadioTap, Dot11Elt, Dot11EltHTCapabilities, Dot11AssoReq
 from scapy.sendrecv import sendp
 
-from datos import *
+from datos_new import *
 
 AP_MAC_2 = '00:c0:ca:a4:73:7c'
 AP_MAC = '00:c0:ca:a4:73:7b'
@@ -60,13 +60,12 @@ def PacketHandler(pkt):
             intAMPDUfinal=int.from_bytes(AMPDU_FINAL, byteorder='big')
             print(hexdump(AMPDU_FINAL))
             if int(forma) == 1 :
-
                 MSDU, lapso = AMPDU_dec(intAMPDUfinal, key)
                 descifrado = MSDU[0].to_bytes((MSDU[0].bit_length() + 7) // 8, byteorder='big')
                 print("Descifrado")
                 print(hexdump(descifrado))
             if int(forma) == 2:
-                MSDUs = AMSDU_dec(Hdr, intAMPDUfinal, ps, xs)
+                MSDUs = MPDUs_dec(Hdr, intAMPDUfinal, ps, xs)
                 #nuevo=MSDUs.to_bytes((MSDUs.bit_length() + 7) // 8, byteorder='big')
                 for i in MSDUs:
                     print("MPDU Descifrado")
