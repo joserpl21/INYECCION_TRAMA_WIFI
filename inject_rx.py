@@ -4,6 +4,7 @@ import sys
 import scapy.all as scapy
 from scapy.layers.dot11 import Dot11, RadioTap, Dot11Elt, Dot11EltHTCapabilities, Dot11AssoReq
 from scapy.sendrecv import sendp
+from scapy.utils import hexdump
 
 
 AP_MAC_2 = '00:c0:ca:a4:73:7c'
