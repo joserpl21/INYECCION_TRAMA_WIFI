@@ -1,6 +1,6 @@
 # 2345678901234567890123456789012345678901234567890123456789012345678901234567890
 # -*- coding: utf-8 -*-
-from Generatramas_new import *
+from Generatramas import *
 import secrets
 from datetime import datetime, timedelta
 from Crypto.Cipher import  AES
