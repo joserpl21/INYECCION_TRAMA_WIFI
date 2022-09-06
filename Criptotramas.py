@@ -1,6 +1,6 @@
 # 2345678901234567890123456789012345678901234567890123456789012345678901234567890
 # -*- coding: utf-8 -*-
-from Generatramas import *
+from Generatramas_new import *
 import secrets
 from datetime import datetime, timedelta
 from Crypto.Cipher import  AES
@@ -219,20 +219,20 @@ def MPDU_enc(MPDU,key):  # Fucnión para generar un MPDU cifrado
     return (int.from_bytes(MPDU_enc, byteorder='big'))  # Además enviamos la clave para la emulación
 
 
-def AMSDU_enc(MSDU,ps,xs,Hdr):  # Función que cifra un AMSDU con el teorema chino del resto (CRT) - modificacion con poner un AMPDU
+def MPDUs_enc(MPDUs,ps,xs,Hdr):  # Función que cifra un AMPDU con el teorema chino del resto (CRT) - modificacion con poner un AMPDU
     a = []  # Máscaras aleatorias
     n = 0  # Contador de MSDUs
-    for i in MSDU:
+    for i in MPDUs:
         a.append((i + pow(Hdr, xs[n], ps[n])) % ps[n])  # y enmascaro el MSDU
         n = n + 1
     return chinese_remainder(ps, a)  # Devuelvo la cabecera aleatoria y un MPDU cifrado con el CRT
 
 
-def AMSDU_dec(Hdr, MPDU, ps, xs):  # Función para descifrar un MPDU que contine una MSDU cifrado con CRT
-    MSDUs = []  # Inicializamos la lista de salida
+def MPDUs_dec(Hdr, MPDU, ps, xs):  # Función para descifrar un MPDU que contine una MSDU cifrado con CRT
+    MPDUs = []  # Inicializamos la lista de salida
     for i in range(len(ps)):
-        MSDUs.append((MPDU - pow(Hdr, xs[i], ps[i])) % ps[i])
-    return (MSDUs)
+        MPDUs.append((MPDU - pow(Hdr, xs[i], ps[i])) % ps[i])
+    return (MPDUs)
 
 
 def chinese_remainder(n, a):  # Función para calcular el cifrado con el CRT
