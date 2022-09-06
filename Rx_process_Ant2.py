@@ -63,12 +63,12 @@ def PacketHandler(pkt):
                 print("Descifrado")
                 print(hexdump(descifrado))
             if int(forma) == 2:
-                MSDUs = AMSDU_dec(Hdr, intAMPDUfinal, ps, xs)
-                #nuevo=MSDUs.to_bytes((MSDUs.bit_length() + 7) // 8, byteorder='big')
-                for i in MSDUs:
+                MPDUs = MPDUs_dec(Hdr, intAMPDUfinal, ps, xs)
+                # nuevo=MSDUs.to_bytes((MSDUs.bit_length() + 7) // 8, byteorder='big')
+                for i in MPDUs:
                     print("MPDU Descifrado")
                     print(hexdump(i.to_bytes((i.bit_length() + 7) // 8, byteorder='big')))
-            exit()
+                exit()
             #MSDU, lapso = AMPDU_dec(int.from_bytes(ver, byteorder='big'), key)
 
 
