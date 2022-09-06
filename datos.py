@@ -32,7 +32,7 @@ def cifrarCRT(ps,xs,Hdr):
     MPDU_Total.append(MPDU_gen(MSDUs1[0],0))
     MPDU_Total.append(MPDU_gen(MSDUs3[0],1))
 
-    mpduCi=AMSDU_enc(MPDU_Total,ps,xs,Hdr)
+    mpduCi=MPDUs_enc(MPDU_Total,ps,xs,Hdr)
 
     mpduCi_Hex= mpduCi.to_bytes((mpduCi.bit_length() + 7) // 8,byteorder='big')
 
