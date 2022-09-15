@@ -46,7 +46,7 @@ def calc_primos(num, long):
     Hdr = random.getrandbits(2047)  # Cabecera común para el cifrado aleatorio
     m = 2 ** (long * 8)
     for i in list(range(num)):
-        pnew = nextprime(m + 3)  # Calculo la clave p
+        pnew = gmpy2.nextprime(m + 3)  # Calculo la clave p
         m = pnew
         psnew.append(pnew)  # y la almaceno en una lista
         xsnew.append(getrandbits(pnew.bit_length() - 1))  # Calculo la máscara aleatoria de cada diferente difrado
